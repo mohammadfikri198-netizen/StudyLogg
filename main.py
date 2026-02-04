@@ -177,10 +177,24 @@ def filter_per_mapel():
     if not hasil:
         print(f"Tidak ada catatan untuk mapel '{m}'.")
         return
-    print(f"\nCatatan untuk mapel '{m}':")
+    print(f"\n=== Catatan untuk Mapel '{m}' ===")
+    
+    no_w = len(str(len(hasil)))
+    tanggal_w = len("Tanggal")
+    topik_w = max(len("Topik"), max(len(c['topik']) for c in hasil))
+    durasi_w = 8
+    
+    header = f"{'No'.ljust(no_w)}  {'Tanggal'.ljust(tanggal_w)}  {'Topik'.ljust(topik_w)}  {'Durasi'.rjust(durasi_w)}  Rating"
+    print(header)
+    print('-' * len(header))
+    
     for i, c in enumerate(hasil, start=1):
         rating = '⭐' * c.get('rating', 3)
-        print(f"{i}. {c['tanggal']} - {c['topik']} ({c['durasi']} menit) {rating}")
+        no = str(i).ljust(no_w)
+        tanggal = c['tanggal'].ljust(tanggal_w)
+        topik = c['topik'].ljust(topik_w)
+        durasi = str(c['durasi']).rjust(durasi_w)
+        print(f"{no}  {tanggal}  {topik}  {durasi} menit  {rating}")
 
 
 def statistik_detail_mapel():
@@ -199,13 +213,22 @@ def statistik_detail_mapel():
         stats[m]['ratings'].append(c.get('rating', 3))
     
     print("\n=== Statistik Detail Per Mapel ===")
+    
+    mapel_w = max(len("Mapel"), max(len(m) for m in stats.keys()))
+    durasi_w = 20
+    topik_w = 12
+    rating_w = 10
+    
+    header = f"{'Mapel'.ljust(mapel_w)}  {'Total Durasi'.ljust(durasi_w)}  {'Topik'.ljust(topik_w)}  Rating"
+    print(header)
+    print('-' * (mapel_w + durasi_w + topik_w + rating_w + 6))
+    
     for mapel in sorted(stats.keys()):
         s = stats[mapel]
         avg_rating = sum(s['ratings']) / len(s['ratings'])
-        print(f"{mapel}:")
-        print(f"  Total durasi: {s['total']} menit ({s['total']//60} jam {s['total']%60} menit)")
-        print(f"  Jumlah topik: {s['count']}")
-        print(f"  Rating rata-rata: {avg_rating:.1f}")
+        durasi_str = f"{s['total']} menit ({s['total']//60}h {s['total']%60}m)"
+        rating_str = f"{avg_rating:.1f}⭐"
+        print(f"{mapel.ljust(mapel_w)}  {durasi_str.ljust(durasi_w)}  {str(s['count']).ljust(topik_w)}  {rating_str.ljust(rating_w)}")
 
 
 def ranking_mapel():
@@ -220,8 +243,18 @@ def ranking_mapel():
     
     sorted_mapel = sorted(totals.items(), key=lambda x: x[1], reverse=True)
     print("\n=== Ranking Mapel ===")
+    
+    rank_w = len(str(len(sorted_mapel)))
+    mapel_w = max(len("Mapel"), max(len(m[0]) for m in sorted_mapel))
+    durasi_w = 20
+    
+    header = f"{'Rank'.ljust(rank_w)}  {'Mapel'.ljust(mapel_w)}  {'Total Durasi'.ljust(durasi_w)}"
+    print(header)
+    print('-' * (rank_w + mapel_w + durasi_w + 4))
+    
     for i, (mapel, durasi) in enumerate(sorted_mapel, start=1):
-        print(f"{i}. {mapel}: {durasi} menit ({durasi//60} jam {durasi%60} menit)")
+        durasi_str = f"{durasi} menit ({durasi//60}h {durasi%60}m)"
+        print(f"{str(i).ljust(rank_w)}  {mapel.ljust(mapel_w)}  {durasi_str.ljust(durasi_w)}")
 
 
 def cari_topik():
@@ -237,10 +270,26 @@ def cari_topik():
         print(f"Tidak ada catatan dengan topik yang mengandung '{keyword}'.")
         return
     
-    print(f"\nHasil pencarian '{keyword}':")
+    print(f"\n=== Hasil Pencarian '{keyword}' ===")
+    
+    no_w = len(str(len(hasil)))
+    mapel_w = max(len("Mapel"), max(len(c['mapel']) for c in hasil))
+    topik_w = max(len("Topik"), max(len(c['topik']) for c in hasil))
+    tanggal_w = len("Tanggal")
+    durasi_w = 8
+    
+    header = f"{'No'.ljust(no_w)}  {'Tanggal'.ljust(tanggal_w)}  {'Mapel'.ljust(mapel_w)}  {'Topik'.ljust(topik_w)}  {'Durasi'.rjust(durasi_w)}  Rating"
+    print(header)
+    print('-' * len(header))
+    
     for i, c in enumerate(hasil, start=1):
         rating = '⭐' * c.get('rating', 3)
-        print(f"{i}. {c['tanggal']} - {c['mapel']}: {c['topik']} ({c['durasi']} menit) {rating}")
+        no = str(i).ljust(no_w)
+        tanggal = c['tanggal'].ljust(tanggal_w)
+        mapel = c['mapel'].ljust(mapel_w)
+        topik = c['topik'].ljust(topik_w)
+        durasi = str(c['durasi']).rjust(durasi_w)
+        print(f"{no}  {tanggal}  {mapel}  {topik}  {durasi} menit  {rating}")
 
 
 def set_target_harian():
@@ -330,13 +379,23 @@ def ringkasan_mingguan():
         t = c.get('tanggal')
         if t in totals_per_day:
             totals_per_day[t] += c['durasi']
-    print("\nRingkasan 7 hari terakhir:")
+    print("\n=== Ringkasan 7 Hari Terakhir ===")
+    tanggal_w = len("Tanggal")
+    durasi_w = 15
+    
+    header = f"{'Tanggal'.ljust(tanggal_w)}  {'Durasi Belajar'.ljust(durasi_w)}"
+    print(header)
+    print('-' * (tanggal_w + durasi_w + 2))
+    
     for d in days:
-        print(f"{d}: {totals_per_day[d]} menit")
+        durasi_str = f"{totals_per_day[d]} menit"
+        print(f"{d.ljust(tanggal_w)}  {durasi_str.ljust(durasi_w)}")
+    
     total_minggu = sum(totals_per_day.values())
     jam = total_minggu // 60
     menit = total_minggu % 60
-    print(f"Total minggu ini: {total_minggu} menit ({jam} jam {menit} menit)")
+    print('-' * (tanggal_w + durasi_w + 2))
+    print(f"{'TOTAL'.ljust(tanggal_w)}  {total_minggu} menit ({jam} jam {menit} menit)")
 
 
 def hitung_streak():
@@ -378,12 +437,22 @@ def hitung_streak():
         streak_aktif = 0
     
     print(f"\n=== Streak Konsistensi Belajar ===")
-    print(f"Streak terpanjang: {streak_max} hari")
-    print(f"Streak saat ini: {streak_aktif} hari")
+    
+    label_w = 20
+    value_w = 15
+    
+    header = f"{'Metrik'.ljust(label_w)}  {'Nilai'.ljust(value_w)}"
+    print(header)
+    print('-' * (label_w + value_w + 2))
+    
+    print(f"{'Streak terpanjang'.ljust(label_w)}  {(str(streak_max) + ' hari').ljust(value_w)}")
+    print(f"{'Streak saat ini'.ljust(label_w)}  {(str(streak_aktif) + ' hari').ljust(value_w)}")
+    
     if streak_aktif > 0:
-        print("Pertahankan momentum belajar Anda! 🔥")
+        status = "Aktif 🔥"
     else:
-        print("Mulai streak belajar hari ini!")
+        status = "Mulai hari ini"
+    print(f"{'Status'.ljust(label_w)}  {status.ljust(value_w)}")
 
 
 def menu():
