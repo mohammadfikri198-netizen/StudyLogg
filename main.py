@@ -1,9 +1,35 @@
 import json
 import csv
 from datetime import date, timedelta
+import os
 
 catatan = []
 target_harian = None
+CATATAN_FILE = "catatan.json"
+
+
+def load_catatan():
+    """Load catatan dari file JSON saat startup."""
+    global catatan
+    if os.path.exists(CATATAN_FILE):
+        try:
+            with open(CATATAN_FILE, 'r', encoding='utf-8') as f:
+                catatan = json.load(f)
+            print(f"✓ Dimuat {len(catatan)} catatan dari {CATATAN_FILE}\n")
+        except Exception as e:
+            print(f"⚠ Gagal load catatan: {e}\n")
+            catatan = []
+    else:
+        catatan = []
+
+
+def save_catatan():
+    """Simpan catatan ke file JSON secara otomatis."""
+    try:
+        with open(CATATAN_FILE, 'w', encoding='utf-8') as f:
+            json.dump(catatan, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"⚠ Gagal menyimpan catatan: {e}")
 
 
 def tambah_catatan():
@@ -41,6 +67,7 @@ def tambah_catatan():
 
     tanggal = date.today().isoformat()
     catatan.append({'mapel': mapel, 'topik': topik, 'durasi': durasi, 'rating': rating, 'tanggal': tanggal})
+    save_catatan()
     print("Catatan berhasil ditambahkan!\n")
 
 
@@ -88,6 +115,7 @@ def hapus_catatan():
                 return
             if 1 <= nomor <= len(catatan):
                 deleted = catatan.pop(nomor - 1)
+                save_catatan()
                 print(f"Catatan '{deleted['topik']}' berhasil dihapus.")
                 return
             print(f"Nomor harus antara 1-{len(catatan)}.")
@@ -140,6 +168,7 @@ def edit_catatan():
             print("Masukkan angka bulat.")
     
     catatan[nomor - 1] = {'mapel': mapel, 'topik': topik, 'durasi': durasi, 'rating': rating, 'tanggal': c['tanggal']}
+    save_catatan()
     print("Catatan berhasil diperbarui.\n")
 
 
@@ -475,6 +504,9 @@ def menu():
     print("16. Export ke CSV")
     print("17. Keluar")
 
+
+# Load data saat startup
+load_catatan()
 
 while True:
     menu()
