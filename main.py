@@ -58,8 +58,14 @@ def total_waktu():
     if not catatan:
         print("Belum ada catatan belajar.")
         return
+
     total = sum(c['durasi'] for c in catatan)
-    print(f"Total waktu belajar: {total} menit")
+    jam = total // 60
+    menit = total % 60
+    if jam > 0:
+        print(f"Total waktu belajar: {total} menit ({jam} jam {menit} menit)")
+    else:
+        print(f"Total waktu belajar: {total} menit")
 
 def menu():
     print("\n=== Study Log App ===")
